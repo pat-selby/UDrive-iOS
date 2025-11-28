@@ -16,6 +16,29 @@ workflows:
       xcode: latest
       cocoapods: default
     scripts:
+      - name: Generate Xcode project (for Windows users)
+        script: |
+          # Check if project already exists
+          if [ ! -d "$XCODE_PROJECT" ]; then
+            echo "Xcode project not found. Generating from project.yml..."
+            # Install xcodegen if not available
+            if ! command -v xcodegen &> /dev/null; then
+              echo "Installing xcodegen..."
+              brew install xcodegen || {
+                echo "xcodegen installation failed. Trying alternative method..."
+                # Alternative: use mint or download binary
+                curl -Ls https://github.com/yonaskolb/XcodeGen/releases/latest/download/xcodegen.zip -o /tmp/xcodegen.zip
+                unzip -q /tmp/xcodegen.zip -d /tmp
+                chmod +x /tmp/xcodegen/bin/xcodegen
+                export PATH="/tmp/xcodegen/bin:$PATH"
+              }
+            fi
+            # Generate project
+            xcodegen generate
+            echo "Xcode project generated successfully!"
+          else
+            echo "Xcode project already exists, skipping generation."
+          fi
       - name: Set up code signing settings on Xcode project
         script: |
           xcode-project use-profiles

@@ -1,0 +1,64 @@
+name: UDrive
+options:
+  bundleIdPrefix: com.udrive
+  deploymentTarget:
+    iOS: "15.0"
+  developmentLanguage: en
+  xcodeVersion: "15.0"
+
+targets:
+  UDrive:
+    type: application
+    platform: iOS
+    deploymentTarget: "15.0"
+    sources:
+      - path: .
+        excludes:
+          - "*.md"
+          - "*.yaml"
+          - "*.yml"
+          - "*.plist"
+          - "*.sh"
+          - ".git"
+          - "build"
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.udrive.app
+      PRODUCT_NAME: UDrive
+      INFOPLIST_FILE: Info.plist
+      SWIFT_VERSION: "5.9"
+      TARGETED_DEVICE_FAMILY: "1,2" # iPhone and iPad
+      IPHONEOS_DEPLOYMENT_TARGET: "15.0"
+      CODE_SIGN_IDENTITY: ""
+      CODE_SIGNING_REQUIRED: NO
+      CODE_SIGNING_ALLOWED: NO
+    info:
+      path: Info.plist
+      properties:
+        CFBundleDisplayName: UDrive
+        CFBundleShortVersionString: "1.0"
+        CFBundleVersion: "1"
+        UILaunchScreen: {}
+        UIRequiredDeviceCapabilities: [armv7]
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        NSLocationWhenInUseUsageDescription: "UDrive needs your location to show nearby drivers and track your ride."
+        NSPhotoLibraryUsageDescription: "UDrive needs access to your photo library to upload driver and vehicle photos."
+        NSCameraUsageDescription: "UDrive needs access to your camera to take driver and vehicle photos."
+
+schemes:
+  UDrive:
+    build:
+      targets:
+        - UDrive
+    run:
+      config: Debug
+    archive:
+      config: Release
+

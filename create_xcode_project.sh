@@ -1,0 +1,93 @@
+#!/bin/bash
+# Script to create Xcode project structure for UDrive iOS app
+# This script should be run on a Mac or in CodeMagic build environment
+
+set -e
+
+PROJECT_NAME="UDrive"
+SCHEME_NAME="UDrive"
+BUNDLE_ID="com.udrive.app"
+
+echo "Creating Xcode project: $PROJECT_NAME"
+
+# Create .xcodeproj directory structure
+mkdir -p "$PROJECT_NAME.xcodeproj/project.xcworkspace/xcshareddata"
+mkdir -p "$PROJECT_NAME.xcodeproj/xcshareddata/xcschemes"
+
+# Create workspace settings
+cat > "$PROJECT_NAME.xcodeproj/project.xcworkspace/contents.xcworkspacedata" << 'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <FileRef
+      location = "self:">
+   </FileRef>
+</Workspace>
+EOF
+
+# Create Info.plist
+cat > Info.plist << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>\$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleDisplayName</key>
+	<string>UDrive</string>
+	<key>CFBundleExecutable</key>
+	<string>\$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>\$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>\$(PRODUCT_NAME)</string>
+	<key>CFBundlePackageType</key>
+	<string>\$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0</string>
+	<key>CFBundleVersion</key>
+	<string>1</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<true/>
+	</dict>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
+	<key>UILaunchScreen</key>
+	<dict/>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+	</array>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>UDrive needs your location to show nearby drivers and track your ride.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>UDrive needs access to your photo library to upload driver and vehicle photos.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>UDrive needs access to your camera to take driver and vehicle photos.</string>
+</dict>
+</plist>
+EOF
+
+echo "Xcode project structure created!"
+echo "Note: You'll need to open this in Xcode to properly configure the project file."
+echo "For CodeMagic builds, the project will be created automatically if this script runs first."
+

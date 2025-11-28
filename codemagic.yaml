@@ -11,7 +11,7 @@ workflows:
       vars:
         # Update these with your actual project values
         XCODE_PROJECT: "UDrive.xcodeproj"  # Or "UDrive.xcworkspace" if using CocoaPods
-        XCODE_SCHEME: "UDrive"  # Your scheme name
+        XCODE_SCHEME: "UDrive"  # Your scheme name - verify this matches your Xcode scheme exactly
         APP_ID: "com.udrive.app"  # Your bundle identifier
       xcode: latest
       cocoapods: default
@@ -25,14 +25,15 @@ workflows:
           # pod install
           # If using Swift Package Manager, dependencies are resolved automatically by Xcode
           echo "Checking for dependencies..."
-      - name: Build ipa for distribution
+      - name: Build and Archive
         script: |
           # Create directory for archive
           mkdir -p build/ios/xcarchive
           
           # Check if using workspace or project
           if [ -f "$XCODE_PROJECT" ]; then
-            xcodebuild archive \
+            echo "Building with project: $XCODE_PROJECT"
+            xcodebuild clean archive \
               -project "$XCODE_PROJECT" \
               -scheme "$XCODE_SCHEME" \
               -sdk iphoneos \
@@ -44,7 +45,8 @@ workflows:
           else
             # If using workspace
             XCODE_WORKSPACE="${XCODE_PROJECT%.*}.xcworkspace"
-            xcodebuild archive \
+            echo "Building with workspace: $XCODE_WORKSPACE"
+            xcodebuild clean archive \
               -workspace "$XCODE_WORKSPACE" \
               -scheme "$XCODE_SCHEME" \
               -sdk iphoneos \
@@ -54,21 +56,40 @@ workflows:
               CODE_SIGNING_REQUIRED=NO \
               CODE_SIGNING_ALLOWED=NO | xcpretty
           fi
+          
+          # Verify archive was created
+          if [ ! -d "build/ios/xcarchive/archive.xcarchive" ]; then
+            echo "Error: Archive was not created!"
+            ls -la build/ios/xcarchive/ || echo "Archive directory does not exist"
+            exit 1
+          fi
+          
+          echo "Archive created successfully at build/ios/xcarchive/archive.xcarchive"
       - name: Export IPA
         script: |
           # Create directory for IPA
           mkdir -p build/ios/ipa
           
-          # Verify archive exists
+          # Verify archive exists before exporting
           if [ ! -d "build/ios/xcarchive/archive.xcarchive" ]; then
-            echo "Error: Archive not found!"
+            echo "Error: Archive not found at build/ios/xcarchive/archive.xcarchive"
             exit 1
           fi
           
+          echo "Exporting IPA from archive..."
           xcodebuild -exportArchive \
-            -archivePath "build/ios/xcarchive/archive.xcarchive" \
-            -exportOptionsPlist export_options.plist \
-            -exportPath "build/ios/ipa"
+            -archivePath build/ios/xcarchive/archive.xcarchive \
+            -exportPath build/ios/ipa \
+            -exportOptionsPlist export_options.plist
+          
+          # Verify IPA was created
+          if [ ! -f "build/ios/ipa/*.ipa" ]; then
+            echo "Warning: IPA file may not have been created"
+            ls -la build/ios/ipa/ || echo "IPA directory is empty"
+          else
+            echo "IPA exported successfully"
+            ls -la build/ios/ipa/
+          fi
     artifacts:
       - build/ios/ipa/*.ipa
       - build/ios/xcarchive/*.xcarchive

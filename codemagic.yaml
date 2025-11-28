@@ -4,10 +4,10 @@ workflows:
     max_build_duration: 120
     instance_type: mac_mini_m1
     environment:
-      groups:
-        # Add your environment variables here if needed
-        # - app_store_credentials
-        # - code_signing
+      # To add environment variable groups, uncomment and add your group names:
+      # groups:
+      #   - app_store_credentials
+      #   - code_signing
       vars:
         # Update these with your actual project values
         XCODE_PROJECT: "UDrive.xcodeproj"  # Or "UDrive.xcworkspace" if using CocoaPods

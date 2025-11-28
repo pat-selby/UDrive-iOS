@@ -27,34 +27,44 @@ workflows:
           echo "Checking for dependencies..."
       - name: Build ipa for distribution
         script: |
+          # Create directory for archive
+          mkdir -p build/ios/xcarchive
+          
           # Check if using workspace or project
           if [ -f "$XCODE_PROJECT" ]; then
-            xcodebuild build \
+            xcodebuild archive \
               -project "$XCODE_PROJECT" \
               -scheme "$XCODE_SCHEME" \
               -sdk iphoneos \
               -configuration Release \
+              -archivePath build/ios/xcarchive/archive.xcarchive \
               CODE_SIGN_IDENTITY="" \
               CODE_SIGNING_REQUIRED=NO \
-              CODE_SIGNING_ALLOWED=NO \
-              -archivePath build/ios/xcarchive/archive.xcarchive \
-              archive | xcpretty
+              CODE_SIGNING_ALLOWED=NO | xcpretty
           else
             # If using workspace
             XCODE_WORKSPACE="${XCODE_PROJECT%.*}.xcworkspace"
-            xcodebuild build \
+            xcodebuild archive \
               -workspace "$XCODE_WORKSPACE" \
               -scheme "$XCODE_SCHEME" \
               -sdk iphoneos \
               -configuration Release \
+              -archivePath build/ios/xcarchive/archive.xcarchive \
               CODE_SIGN_IDENTITY="" \
               CODE_SIGNING_REQUIRED=NO \
-              CODE_SIGNING_ALLOWED=NO \
-              -archivePath build/ios/xcarchive/archive.xcarchive \
-              archive | xcpretty
+              CODE_SIGNING_ALLOWED=NO | xcpretty
           fi
       - name: Export IPA
         script: |
+          # Create directory for IPA
+          mkdir -p build/ios/ipa
+          
+          # Verify archive exists
+          if [ ! -d "build/ios/xcarchive/archive.xcarchive" ]; then
+            echo "Error: Archive not found!"
+            exit 1
+          fi
+          
           xcodebuild -exportArchive \
             -archivePath "build/ios/xcarchive/archive.xcarchive" \
             -exportOptionsPlist export_options.plist \

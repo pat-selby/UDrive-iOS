@@ -25,19 +25,35 @@ workflows:
             if ! command -v xcodegen &> /dev/null; then
               echo "Installing xcodegen..."
               brew install xcodegen || {
-                echo "xcodegen installation failed. Trying alternative method..."
-                # Alternative: use mint or download binary
+                echo "brew install failed. Trying direct download..."
+                # Download and install xcodegen binary
                 curl -Ls https://github.com/yonaskolb/XcodeGen/releases/latest/download/xcodegen.zip -o /tmp/xcodegen.zip
-                unzip -q /tmp/xcodegen.zip -d /tmp
+                unzip -q /tmp/xcodegen.zip -d /tmp/xcodegen
                 chmod +x /tmp/xcodegen/bin/xcodegen
                 export PATH="/tmp/xcodegen/bin:$PATH"
               }
             fi
+            # Verify xcodegen is available
+            if ! command -v xcodegen &> /dev/null; then
+              echo "Error: xcodegen is not available after installation attempt"
+              exit 1
+            fi
+            echo "xcodegen version: $(xcodegen --version || echo 'unknown')"
             # Generate project
-            xcodegen generate
-            echo "Xcode project generated successfully!"
+            xcodegen generate || {
+              echo "Error: xcodegen failed to generate project"
+              exit 1
+            }
+            # Verify project was created
+            if [ ! -d "$XCODE_PROJECT" ]; then
+              echo "Error: Project was not generated!"
+              ls -la
+              exit 1
+            fi
+            echo "Xcode project generated successfully at $XCODE_PROJECT"
+            ls -la "$XCODE_PROJECT"
           else
-            echo "Xcode project already exists, skipping generation."
+            echo "Xcode project already exists at $XCODE_PROJECT, skipping generation."
           fi
       - name: Set up code signing settings on Xcode project
         script: |
@@ -53,32 +69,34 @@ workflows:
           # Create directory for archive
           mkdir -p build/ios/xcarchive
           
-          # Check if using workspace or project
-          if [ -f "$XCODE_PROJECT" ]; then
-            echo "Building with project: $XCODE_PROJECT"
-            xcodebuild clean archive \
-              -project "$XCODE_PROJECT" \
-              -scheme "$XCODE_SCHEME" \
-              -sdk iphoneos \
-              -configuration Release \
-              -archivePath build/ios/xcarchive/archive.xcarchive \
-              CODE_SIGN_IDENTITY="" \
-              CODE_SIGNING_REQUIRED=NO \
-              CODE_SIGNING_ALLOWED=NO | xcpretty
-          else
-            # If using workspace
-            XCODE_WORKSPACE="${XCODE_PROJECT%.*}.xcworkspace"
-            echo "Building with workspace: $XCODE_WORKSPACE"
-            xcodebuild clean archive \
-              -workspace "$XCODE_WORKSPACE" \
-              -scheme "$XCODE_SCHEME" \
-              -sdk iphoneos \
-              -configuration Release \
-              -archivePath build/ios/xcarchive/archive.xcarchive \
-              CODE_SIGN_IDENTITY="" \
-              CODE_SIGNING_REQUIRED=NO \
-              CODE_SIGNING_ALLOWED=NO | xcpretty
+          # Verify project exists
+          if [ ! -d "$XCODE_PROJECT" ]; then
+            echo "Error: Xcode project not found at $XCODE_PROJECT"
+            echo "Current directory contents:"
+            ls -la
+            exit 1
           fi
+          
+          echo "Building with project: $XCODE_PROJECT"
+          echo "Scheme: $XCODE_SCHEME"
+          
+          # List available schemes
+          echo "Available schemes:"
+          xcodebuild -list -project "$XCODE_PROJECT" || echo "Could not list schemes"
+          
+          # Build and archive using project (not workspace)
+          xcodebuild clean archive \
+            -project "$XCODE_PROJECT" \
+            -scheme "$XCODE_SCHEME" \
+            -sdk iphoneos \
+            -configuration Release \
+            -archivePath build/ios/xcarchive/archive.xcarchive \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO | xcpretty || {
+            echo "Build failed. Checking for errors..."
+            exit 1
+          }
           
           # Verify archive was created
           if [ ! -d "build/ios/xcarchive/archive.xcarchive" ]; then

@@ -74,6 +74,36 @@ For testing the login:
 2. Build and run on simulator or device
 3. The app uses mock data, so no backend setup is required
 
+## CI/CD Setup
+
+The project includes a `codemagic.yaml` configuration file for automated builds with CodeMagic CI/CD.
+
+### CodeMagic Configuration
+
+Before using CodeMagic:
+
+1. **Update `codemagic.yaml`**:
+   - Set `XCODE_PROJECT` to your actual project file name
+   - Set `XCODE_SCHEME` to your scheme name
+   - Set `APP_ID` to your bundle identifier
+   - Update email in the publishing section
+
+2. **Update `export_options.plist`**:
+   - Set `YOUR_TEAM_ID` to your Apple Developer Team ID
+   - Adjust signing method if needed (development/ad-hoc/app-store/enterprise)
+
+3. **Code Signing** (Optional):
+   - For App Store distribution, set up App Store Connect API key in CodeMagic
+   - Add certificates and provisioning profiles in CodeMagic dashboard
+   - Uncomment the `app_store_connect` section in `codemagic.yaml`
+
+### Building Locally
+
+To build the project locally:
+```bash
+xcodebuild -project UDrive.xcodeproj -scheme UDrive -sdk iphoneos -configuration Release
+```
+
 ## Notes
 
 - All data is mock/demo data

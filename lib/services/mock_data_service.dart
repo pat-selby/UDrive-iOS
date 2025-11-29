@@ -20,31 +20,58 @@ class MockDataService extends ChangeNotifier {
   List<Vehicle> get vehicles => List.unmodifiable(_vehicles);
 
   void _loadMockData() {
+    // GSU Students
     _users.addAll([
       User(
         id: '1',
-        name: 'John Student',
-        email: 'john@student.edu',
+        name: 'Marcus Johnson',
+        email: 'mjohnson@gram.edu',
         userType: UserType.student,
-        phoneNumber: '555-0101',
+        phoneNumber: '(318) 555-0101',
       ),
       User(
         id: '2',
-        name: 'Sarah Driver',
-        email: 'sarah@driver.com',
-        userType: UserType.driver,
-        phoneNumber: '555-0202',
+        name: 'Keisha Williams',
+        email: 'kwilliams@gram.edu',
+        userType: UserType.student,
+        phoneNumber: '(318) 555-0102',
+      ),
+      User(
+        id: '3',
+        name: 'David Thompson',
+        email: 'dthompson@gram.edu',
+        userType: UserType.student,
+        phoneNumber: '(318) 555-0103',
       ),
     ]);
 
+    // GSU Drivers (Students who also drive)
+    _users.addAll([
+      User(
+        id: '4',
+        name: 'James Wilson',
+        email: 'jwilson@gram.edu',
+        userType: UserType.driver,
+        phoneNumber: '(318) 555-0201',
+      ),
+      User(
+        id: '5',
+        name: 'Sarah Davis',
+        email: 'sdavis@gram.edu',
+        userType: UserType.driver,
+        phoneNumber: '(318) 555-0202',
+      ),
+    ]);
+
+    // Vehicles (GSU student drivers)
     _vehicles.addAll([
       Vehicle(
         id: '1',
         make: 'Toyota',
         model: 'Camry',
         year: 2022,
-        color: 'Blue',
-        licensePlate: 'ABC-1234',
+        color: 'Black',
+        licensePlate: 'GSU-2024',
         capacity: 4,
       ),
       Vehicle(
@@ -52,28 +79,75 @@ class MockDataService extends ChangeNotifier {
         make: 'Honda',
         model: 'Accord',
         year: 2021,
-        color: 'Red',
-        licensePlate: 'XYZ-5678',
+        color: 'Gold',
+        licensePlate: 'TIGER-1',
         capacity: 5,
+      ),
+      Vehicle(
+        id: '3',
+        make: 'Nissan',
+        model: 'Altima',
+        year: 2023,
+        color: 'Black',
+        licensePlate: 'GSU-TGR',
+        capacity: 4,
       ),
     ]);
 
+    // GSU Campus Locations
+    final gsuMainCampus = Location(
+      latitude: 32.5274,
+      longitude: -92.7144,
+      address: '403 Main Street, Grambling, LA 71245',
+    );
+
+    final studentHousing = Location(
+      latitude: 32.5280,
+      longitude: -92.7150,
+      address: 'GSU Student Housing, Grambling, LA',
+    );
+
+    final library = Location(
+      latitude: 32.5268,
+      longitude: -92.7140,
+      address: 'A.C. Lewis Memorial Library, GSU Campus',
+    );
+
+    final stadium = Location(
+      latitude: 32.5290,
+      longitude: -92.7160,
+      address: 'Eddie G. Robinson Memorial Stadium, GSU',
+    );
+
+    final diningHall = Location(
+      latitude: 32.5270,
+      longitude: -92.7145,
+      address: 'GSU Dining Hall, Main Campus',
+    );
+
+    final healthCenter = Location(
+      latitude: 32.5265,
+      longitude: -92.7135,
+      address: 'GSU Health Center, Campus',
+    );
+
+    // Active rides on GSU campus
     _rides.addAll([
       Ride(
         id: '1',
         studentId: _users[0].id,
-        driverId: _users[1].id,
-        pickupLocation: Location(
-          latitude: 37.7749,
-          longitude: -122.4194,
-          address: '123 Main St',
-        ),
-        dropoffLocation: Location(
-          latitude: 37.7849,
-          longitude: -122.4094,
-          address: '456 Oak Ave',
-        ),
+        driverId: _users[3].id,
+        pickupLocation: studentHousing,
+        dropoffLocation: library,
         status: RideStatus.inProgress,
+        isEmergency: false,
+      ),
+      Ride(
+        id: '2',
+        studentId: _users[1].id,
+        pickupLocation: diningHall,
+        dropoffLocation: stadium,
+        status: RideStatus.requested,
         isEmergency: false,
       ),
     ]);
@@ -105,5 +179,50 @@ class MockDataService extends ChangeNotifier {
               ride.status == RideStatus.inProgress);
     }).toList();
   }
-}
 
+  // GSU Campus locations for quick selection
+  static List<Location> getGSUCampusLocations() {
+    return [
+      Location(
+        latitude: 32.5274,
+        longitude: -92.7144,
+        address: 'GSU Main Campus, 403 Main Street',
+      ),
+      Location(
+        latitude: 32.5280,
+        longitude: -92.7150,
+        address: 'Student Housing Complex',
+      ),
+      Location(
+        latitude: 32.5268,
+        longitude: -92.7140,
+        address: 'A.C. Lewis Memorial Library',
+      ),
+      Location(
+        latitude: 32.5290,
+        longitude: -92.7160,
+        address: 'Eddie G. Robinson Memorial Stadium',
+      ),
+      Location(
+        latitude: 32.5270,
+        longitude: -92.7145,
+        address: 'GSU Dining Hall',
+      ),
+      Location(
+        latitude: 32.5265,
+        longitude: -92.7135,
+        address: 'GSU Health Center',
+      ),
+      Location(
+        latitude: 32.5285,
+        longitude: -92.7155,
+        address: 'GSU Student Union',
+      ),
+      Location(
+        latitude: 32.5275,
+        longitude: -92.7148,
+        address: 'GSU Science Building',
+      ),
+    ];
+  }
+}

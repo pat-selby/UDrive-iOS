@@ -34,30 +34,33 @@ class LoginViewModel extends ChangeNotifier {
 
     _isLoading = false;
 
-    // Mock login logic
-    if (_email.toLowerCase().contains('student')) {
+    // Mock login logic - GSU email format
+    final emailLower = _email.toLowerCase();
+    
+    if (emailLower.contains('@gram.edu') || emailLower.contains('student')) {
       final user = User(
         id: '1',
-        name: 'John Student',
+        name: 'Marcus Johnson',
         email: _email,
         userType: UserType.student,
+        phoneNumber: '(318) 555-0101',
       );
       notifyListeners();
       return user;
-    } else if (_email.toLowerCase().contains('driver')) {
+    } else if (emailLower.contains('driver') || emailLower.contains('@gram.edu')) {
       final user = User(
-        id: '2',
-        name: 'Sarah Driver',
+        id: '4',
+        name: 'James Wilson',
         email: _email,
         userType: UserType.driver,
+        phoneNumber: '(318) 555-0201',
       );
       notifyListeners();
       return user;
     } else {
-      _errorMessage = 'Invalid credentials. Try \'student@test.com\' or \'driver@test.com\'';
+      _errorMessage = 'Invalid GSU credentials. Use your @gram.edu email or try "student@gram.edu" / "driver@gram.edu"';
       notifyListeners();
       return null;
     }
   }
 }
-

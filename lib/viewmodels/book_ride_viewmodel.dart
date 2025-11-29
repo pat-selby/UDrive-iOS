@@ -28,25 +28,33 @@ class BookRideViewModel extends ChangeNotifier {
 
   void setPickupAddress(String address) {
     _pickupAddress = address;
-    if (address.isNotEmpty) {
-      _pickupLocation = Location(
-        latitude: 37.7749,
-        longitude: -122.4194,
+    // Find matching GSU location
+    final locations = MockDataService.getGSUCampusLocations();
+    final location = locations.firstWhere(
+      (loc) => loc.address == address,
+      orElse: () => Location(
+        latitude: 32.5274,
+        longitude: -92.7144,
         address: address,
-      );
-    }
+      ),
+    );
+    _pickupLocation = location;
     notifyListeners();
   }
 
   void setDropoffAddress(String address) {
     _dropoffAddress = address;
-    if (address.isNotEmpty) {
-      _dropoffLocation = Location(
-        latitude: 37.7849,
-        longitude: -122.4094,
+    // Find matching GSU location
+    final locations = MockDataService.getGSUCampusLocations();
+    final location = locations.firstWhere(
+      (loc) => loc.address == address,
+      orElse: () => Location(
+        latitude: 32.5274,
+        longitude: -92.7144,
         address: address,
-      );
-    }
+      ),
+    );
+    _dropoffLocation = location;
     notifyListeners();
   }
 
@@ -73,4 +81,3 @@ class BookRideViewModel extends ChangeNotifier {
     return ride;
   }
 }
-

@@ -11,20 +11,19 @@ class TrackShuttleViewModel extends ChangeNotifier {
     _ride = Ride(
       id: '1',
       studentId: '1',
-      driverId: '2',
+      driverId: '4',
       pickupLocation: Location(
-        latitude: 37.7749,
-        longitude: -122.4194,
-        address: '123 Main St',
+        latitude: 32.5280,
+        longitude: -92.7150,
+        address: 'Student Housing Complex',
       ),
       dropoffLocation: Location(
-        latitude: 37.7849,
-        longitude: -122.4094,
-        address: '456 Oak Ave',
+        latitude: 32.5268,
+        longitude: -92.7140,
+        address: 'A.C. Lewis Memorial Library',
       ),
       status: RideStatus.inProgress,
     );
     notifyListeners();
   }
 }
-

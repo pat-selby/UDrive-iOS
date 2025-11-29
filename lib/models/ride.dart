@@ -1,4 +1,4 @@
-import 'models/location.dart';
+import 'location.dart';
 
 enum RideStatus {
   requested,

@@ -23,11 +23,65 @@ class UDriveApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => NavigationService(),
       child: MaterialApp(
-        title: 'UDrive',
+        title: 'UDrive - Grambling State University',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          primarySwatch: Colors.blue,
+          // Grambling State University Colors: Black and Gold
+          primaryColor: const Color(0xFF000000), // Black
+          primarySwatch: Colors.amber, // Gold/Amber
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color(0xFFFFD700), // Gold
+            primary: const Color(0xFF000000), // Black
+            secondary: const Color(0xFFFFD700), // Gold
+            surface: Colors.white,
+            onPrimary: Colors.white,
+            onSecondary: Colors.black,
+          ),
           useMaterial3: true,
+          scaffoldBackgroundColor: Colors.grey[50],
+          appBarTheme: AppBarTheme(
+            backgroundColor: const Color(0xFF000000),
+            foregroundColor: const Color(0xFFFFD700),
+            elevation: 0,
+            centerTitle: true,
+            titleTextStyle: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFFFFD700),
+            ),
+          ),
+          cardTheme: CardTheme(
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+          ),
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF000000),
+              foregroundColor: const Color(0xFFFFD700),
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 3,
+            ),
+          ),
+          textTheme: const TextTheme(
+            headlineLarge: TextStyle(
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF000000),
+            ),
+            headlineMedium: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF000000),
+            ),
+            bodyLarge: TextStyle(
+              fontSize: 16,
+              color: Colors.black87,
+            ),
+          ),
         ),
         home: const ContentView(),
       ),
@@ -42,28 +96,80 @@ class ContentView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<NavigationService>(
       builder: (context, navigationService, _) {
+        Widget screen;
         switch (navigationService.currentScreen) {
           case AppScreen.onboarding:
-            return const OnboardingScreen();
+            screen = const OnboardingScreen();
+            break;
           case AppScreen.login:
-            return const LoginScreen();
+            screen = const LoginScreen();
+            break;
           case AppScreen.signupChoice:
-            return const SignupChoiceScreen();
+            screen = const SignupChoiceScreen();
+            break;
           case AppScreen.studentDashboard:
-            return const StudentDashboardScreen();
+            screen = const StudentDashboardScreen();
+            break;
           case AppScreen.driverDashboard:
-            return const DriverDashboardScreen();
+            screen = const DriverDashboardScreen();
+            break;
           case AppScreen.bookRide:
-            return const BookRideScreen();
+            screen = const BookRideScreen();
+            break;
           case AppScreen.trackShuttle:
-            return const TrackShuttleMapScreen();
+            screen = const TrackShuttleMapScreen();
+            break;
           case AppScreen.driverRegistration:
-            return const DriverRegistrationScreen();
+            screen = const DriverRegistrationScreen();
+            break;
           case AppScreen.emergencyRide:
-            return const EmergencyRideRequestScreen();
+            screen = const EmergencyRideRequestScreen();
+            break;
         }
+
+        // Add page transition animation
+        return PageTransitionWrapper(
+          child: screen,
+          route: navigationService.currentScreen,
+        );
       },
     );
   }
 }
 
+class PageTransitionWrapper extends StatelessWidget {
+  final Widget child;
+  final AppScreen route;
+
+  const PageTransitionWrapper({
+    super.key,
+    required this.child,
+    required this.route,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 300),
+      transitionBuilder: (child, animation) {
+        return FadeTransition(
+          opacity: animation,
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0.1, 0),
+              end: Offset.zero,
+            ).animate(CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOutCubic,
+            )),
+            child: child,
+          ),
+        );
+      },
+      child: KeyedSubtree(
+        key: ValueKey(route),
+        child: child,
+      ),
+    );
+  }
+}
